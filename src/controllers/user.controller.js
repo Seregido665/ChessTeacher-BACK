@@ -8,19 +8,30 @@ module.exports.registerUser = async (req, res) => {
   try {
     const newUser = req.body;
 
-    // - Comprueba si el usuario existe -
-    const existingUser = await UserModel.findOne({ email: newUser.email });
-    if (existingUser) {
+    // - Comprueba si el email ya existe -
+    const existingEmail = await UserModel.findOne({ email: newUser.email });
+    if (existingEmail) {
       return res.status(422).json({
-        errors: { email: { message: "El email ya está registrado" }
+        errors: {
+          email: { message: "El email ya está registrado" }
         }
       });
     }
 
-    // - Si no hay, crea el nuevo usuario -
+    // - Comprueba si el nombre ya existe -
+    const existingName = await UserModel.findOne({ name: newUser.name });
+    if (existingName) {
+      return res.status(422).json({
+        errors: {
+          name: { message: "El nombre de usuario ya está en uso" }
+        }
+      });
+    }
+
+    // - Si no hay conflictos, crea el usuario -
     const user = await UserModel.create(newUser);
 
-    // - POR SEGURIDAD, no devolvemos la contraseña en la respuesta
+    // - No devolver la contraseña -
     const userResponse = {
       _id: user._id,
       name: user.name,
@@ -31,11 +42,15 @@ module.exports.registerUser = async (req, res) => {
       message: "Usuario creado correctamente",
       user: userResponse,
     });
+
   } catch (err) {
-    res
-      res.status(500).json({ message: "Error registrando usuario", error: err.message });
+    res.status(500).json({
+      message: "Error registrando usuario",
+      error: err.message
+    });
   }
 };
+
 
 // -- INICIAR SESION --
 module.exports.loginUser = async (req, res) => {
