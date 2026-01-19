@@ -26,7 +26,8 @@ const matchSchema = new mongoose.Schema({
 
   moveHistory: {
     type: [String],
-    required: true
+    required: true,
+    default: []
   },
 
   totalMoves: {
