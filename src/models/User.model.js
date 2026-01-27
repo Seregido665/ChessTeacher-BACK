@@ -22,12 +22,23 @@ const userSchema = new mongoose.Schema({
   // MONGO GENERA UN ID PERO ASI: _id
   // Para cambiarlo:
   toJSON: {
+    virtuals: true,
     transform: (doc, ret) => {
       ret.id = ret._id; // Pasamos '_id' a 'id'
       delete ret._id;   // Eliminamos '_id'
       delete ret.__v;      // Y '__v'
     }
-  }
+  },
+  toObject: { virtuals: true },
+});
+
+
+// -- VIRTUAL DE matches --
+userSchema.virtual("matches", {
+  ref: "Match",
+  localField: "_id",
+  foreignField: "user",
+  justOne: false,
 });
 
 
@@ -36,14 +47,12 @@ const userSchema = new mongoose.Schema({
 userSchema.pre("save", function (next) {   
   const user = this;
 
-  // PARA COMPROBAR QUE NO SE HA CAMBIADO LA CONTRASEÑA
-  // Y QUE NO SE hashee DE NUEVO.
+  // PARA COMPROBAR QUE NO SE HA CAMBIADO LA CONTRASEÑA, Y QUE NO SE hashee DE NUEVO.
   if (!user.isModified("password")) {  
     return next();
   }
 
-  // VALOR ALEATORIO UNICO A MI CONTRASEÑA
-  // CON 10 RONDAS DE ENCRIPTACION.
+  // VALOR ALEATORIO UNICO A MI CONTRASEÑA CON 10 RONDAS DE ENCRIPTACION.
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(user.password, salt);
   user.password = hashedPassword;

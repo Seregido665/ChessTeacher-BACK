@@ -30,7 +30,7 @@ module.exports.saveMatch = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("🔥 ERROR GUARDANDO PARTIDA:", error);
+    console.error("ERROR GUARDANDO PARTIDA:", error);
     res.status(500).json({
       message: error.message
     });
@@ -42,6 +42,19 @@ module.exports.getMatches = (req, res, next) => {
   MatchModel.find()
     .then((matches) => {
       res.json(matches);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+};
+
+// -- BORRAR UN USUARIO :React ---
+module.exports.deleteMatch = (req, res, next) => {
+  const id = req.params.id;       // PUEDE QUE SEA _id ¿?¿?¿?¿?¿?¿?¿?¿?
+
+  MatchModel.findByIdAndDelete(id)
+    .then(() => {
+      res.json("Match deleted successfully");
     })
     .catch((err) => {
       res.json(err);

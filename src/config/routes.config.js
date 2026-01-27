@@ -2,19 +2,30 @@ const express = require("express");
 const router = express.Router();
 
 // --- AGRUPAMOS TODAS LAS LLAMADAS DE LA APLICACION ---
+const authController = require("../controllers/auth.controller");
 const usersController = require("../controllers/user.controller");
 const matchesController = require("../controllers/match.controller");
 
-router.post("/register", usersController.registerUser);
-router.get("/users", usersController.getUsers);
-router.post("/login", usersController.loginUser);
-router.get("/user/:id", usersController.getUserById);
-router.delete("/user/:id", usersController.deleteUser);
-router.patch("/user/:id", usersController.updateUser);
+const { authenticateToken } = require("../middlewares/auth.middleware");
 
-router.post("/save", matchesController.saveMatch);
-router.get("/matches", matchesController.getMatches);
-/*router.get("/match/:id", matchesController.getMatchById);
-router.delete("/match/:id", matchesController.deleteMatch);*/
+
+// AUTH
+// ------------------------------------------------------------------
+router.post("/register", authController.register);
+router.post("/login", authController.login);
+router.get("/profile", authenticateToken, authController.getProfile);
+router.post("/refresh-token", authenticateToken, authenticateToken, authController.refreshToken);
+        
+// USERS 
+// ------------------------------------------------------------------
+router.delete("/user/:id", authenticateToken, usersController.deleteUser);
+router.patch("/user/:id", authenticateToken, usersController.updateUser);
+
+// MTCHES
+// ------------------------------------------------------------------
+router.post("/save", authenticateToken, matchesController.saveMatch);
+router.get("/matches", authenticateToken, matchesController.getMatches);
+router.get("/matches/:id", authenticateToken, matchesController.deleteMatch);
+/*router.get("/match/:id", matchesController.getMatchById);*/
 
 module.exports = router;
