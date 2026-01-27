@@ -11,7 +11,7 @@ module.exports.saveMatch = async (req, res) => {
       totalMoves,
       difficulty,
       finalFen
-    } = req.body;
+    } = req.body || {};
 
     const match = await MatchModel.create({
       user,
@@ -37,15 +37,16 @@ module.exports.saveMatch = async (req, res) => {
   }
 };
 
-// - TODAS LAS PARTIDAS -
-module.exports.getMatches = (req, res, next) => {
-  MatchModel.find()
-    .then((matches) => {
-      res.json(matches);
-    })
-    .catch((err) => {
-      res.json(err);
-    });
+// - PARTIDAS DEL USUARIO -
+module.exports.getMatches = async (req, res) => {
+  try {
+    const matches = await MatchModel.find({ user: req.user.id })
+                                    .sort({ createdAt: -1 }); // Ordenar por más reciente primero
+
+    return res.json(matches); 
+  } catch (err) {
+    return res.status(500).json({ message: err.message }); 
+  }
 };
 
 // -- BORRAR UN USUARIO :React ---
