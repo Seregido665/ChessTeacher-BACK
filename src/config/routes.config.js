@@ -26,6 +26,5 @@ router.patch("/user/:id", authenticateToken, usersController.updateUser);
 router.post("/save", authenticateToken, matchesController.saveMatch);
 router.get("/matches", authenticateToken, matchesController.getMatches);
 router.delete("/matches/:id", authenticateToken, matchesController.deleteMatch);
-/*router.get("/match/:id", matchesController.getMatchById);*/
 
 module.exports = router;

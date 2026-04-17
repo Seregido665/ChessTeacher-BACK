@@ -20,11 +20,10 @@ const authenticateToken = async (req, res, next) => {
     }
 
     req.user = user;
-    console.log("Usuario autenticado:", req.user._id); 
     next();
     
   } catch (error) {
-    console.error("Error en authenticateToken:", error); 
+    res.status(500).json({ message: "Error del servidor" });
   }
 };
 
